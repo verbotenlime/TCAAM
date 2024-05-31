@@ -8,7 +8,7 @@ const bufferSize = 15; // Adjust the buffer size as needed
 
 let muteTimeout;
 let unmuteTimeout;
-const muteDelay = 5000; // Set delay before muting
+const muteDelay = 7000; // Set delay before muting
 const unmuteDelay = 3000; // Set delay before unmuting
 
 // Function to handle network requests
