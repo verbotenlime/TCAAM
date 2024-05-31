@@ -4,17 +4,16 @@ function getVideoElement() {
 
 // Buffer to store recent URLs
 const urlBuffer = [];
-const bufferSize = 15; // Adjust the buffer size as needed
+const bufferSize = 20; // Adjust the buffer size as needed
 
-let muteTimeout;
-let unmuteTimeout;
-const muteDelay = 7000; // Set delay before muting
-const unmuteDelay = 3000; // Set delay before unmuting
+let inBreakDetectedAt = null; // Timestamp when "inbreak" was first detected
+const muteDelay = 7000; // Set delay before muting in milliseconds
 
 // Function to handle network requests
 function handleNetworkRequest(entry) {
     const url = entry.name;
     const video = getVideoElement();
+    console.log(video);
     
     if (!video) {
         console.log("No video element found.");
@@ -31,27 +30,33 @@ function handleNetworkRequest(entry) {
     // Check if the buffer contains "inbreak"
     const inBreak = urlBuffer.some(u => u.includes("inbreak"));
 
-    clearTimeout(unmuteTimeout);
-
-    //Mute video when the buffer contains "inbreak"
+    //Mute and hide video when the buffer contains "inbreak"
     if (inBreak) { 
-        clearTimeout(muteTimeout);
-        muteTimeout = setTimeout(() => {
-            if (!video.muted) {
-                video.muted = true;
-                console.log("Ad break detected, muting video.");
-            }
-        }, muteDelay);
-    //Unmute video once the buffer no longer contains "inbreak"
-    } else { 
-        clearTimeout(muteTimeout);
-        unmuteTimeout = setTimeout(() => {
-            if (video.muted) {
-                video.muted = false;
-                console.log("Ad break ended, unmuting video.");
-            } 
-        }, unmuteDelay);
-    }    
+        if (!inBreakDetectedAt) {
+            // Record the time when "inbreak" was first detected
+            inBreakDetectedAt = Date.now();
+            console.log("inbreak detected at", inBreakDetectedAt);
+        }
+
+        const elapsed = Date.now() - inBreakDetectedAt;
+
+        if (elapsed >= muteDelay && !video.muted) {
+            video.muted = true;
+            video.hidden = true;
+            console.log("Ad break detected, muting video after delay.");
+        }
+    }
+
+    //Unmute and unhide video when buffer no longer contains "inbreak"
+    else {
+        console.log("NOT INBREAK");
+        inBreakDetectedAt = null; // Reset the timestamp when "inbreak" is not detected
+        if (video.muted) {
+            video.muted = false;
+            video.hidden = false;
+            console.log("Ad break ended, unmuting video.");
+        }
+    }
 }
 
 // Setup PerformanceObserver to monitor network requests
