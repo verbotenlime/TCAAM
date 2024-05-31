@@ -8,13 +8,12 @@ const bufferSize = 15; // Adjust the buffer size as needed
 
 let muteTimeout;
 let unmuteTimeout;
-const muteDelay = 5000; // X second delay before muting
-const unmuteDelay = 3000; // X second delay before unmuting
+const muteDelay = 5000; // Set delay before muting
+const unmuteDelay = 3000; // Set delay before unmuting
 
 // Function to handle network requests
 function handleNetworkRequest(entry) {
     const url = entry.name;
-    console.log("Network request detected:", url);  // Log the URL of each network request
     const video = getVideoElement();
     
     if (!video) {
@@ -34,27 +33,25 @@ function handleNetworkRequest(entry) {
 
     clearTimeout(unmuteTimeout);
 
-    if (inBreak) {
-
+    //Mute video when the buffer contains "inbreak"
+    if (inBreak) { 
         clearTimeout(muteTimeout);
         muteTimeout = setTimeout(() => {
-        // If any URL in the buffer contains "inbreak", mute the video
             if (!video.muted) {
                 video.muted = true;
                 console.log("Ad break detected, muting video.");
             }
         }, muteDelay);
-    } else {
+    //Unmute video once the buffer no longer contains "inbreak"
+    } else { 
         clearTimeout(muteTimeout);
         unmuteTimeout = setTimeout(() => {
-        // If no URL in the buffer contains "inbreak", unmute the video
             if (video.muted) {
                 video.muted = false;
                 console.log("Ad break ended, unmuting video.");
             } 
         }, unmuteDelay);
-}
-    
+    }    
 }
 
 // Setup PerformanceObserver to monitor network requests
