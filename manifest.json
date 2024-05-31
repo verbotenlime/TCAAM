@@ -1,0 +1,22 @@
+{
+    "name": "Tennis Channel Ad Auto Mute",
+    "short_name": "TCAAM",
+    "description": "Automatically mute the Tennis Channel TV live stream during ad breaks",
+    "version": "1.0",
+    "manifest_version": 3,
+
+    "icons": {
+        "48": "icon_48.png",
+        "128": "icon_128.png"
+      },
+
+    "content_scripts": [{
+            "js": [ "script.js" ],
+            "run_at": "document_idle",
+            "matches": [ "https://www.tennischannel.com/*" ]
+    }],
+
+    "permissions": [
+        "webRequest"
+    ]
+}
